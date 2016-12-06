@@ -4,6 +4,16 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var password = process.env.PASSWORD || 'password';
+
+var dbUrl = 'mongodb://erwin:' + password + '@ds127978.mlab.com:27978/localchat';
+mongoose.connect(dbUrl, function(err, res) {
+  if(err) {
+    console.log('DB connection failed: ' + err);
+  }
+  console.log('DB connected');
+});
 
 var index = require('./routes/index');
 var api = require('./routes/api');
