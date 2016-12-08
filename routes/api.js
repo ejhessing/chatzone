@@ -1,15 +1,26 @@
 var express = require('express');
 var router = express.Router();
 var ZoneController = require('../controllers/ZoneController');
+var controllers = require('../controllers');
+
 
 module.exports = router;
 
 router.get('/:resource', function(req, res, next) {
+
  
   var resource = req.params.resource;
+  var controller = controllers[resource];
   
-  if(resource === 'zone') {
-     ZoneController.find(req.query, function(err, results) {
+  if(controller == null) {
+     res.json({
+        confirmation: 'fail',
+        message: 'Not a valid resource'
+     });
+     return;
+  }
+  
+  controller.find(req.query, function(err, results) {
         if(err) {
            res.json({
               confirmation:'fail',
@@ -22,37 +33,52 @@ router.get('/:resource', function(req, res, next) {
            results: results 
         });
      });
-  }
 });
 
 router.get('/:resource/:id', function(req, res, next) {
   
   var resource = req.params.resource;
   var id = req.params.id;
+  var controller = controllers[resource];
   
-  if(resource === 'zone') {
-     ZoneController.findById(id, function(err, results) {
-        if(err) {
-           res.json({
-              confirmation:'fail',
-              message: "Not Found"
-           });
-            return;
-        }
-        res.json({
-           confirmation: 'success',
-           results: results 
-        });
+  if(controller == null) {
+     res.json({
+        confirmation: 'fail',
+        message: 'Not a valid resource'
      });
+     return;
   }
+  
+  controller.findById(id, function(err, results) {
+     if(err) {
+        res.json({
+           confirmation:'fail',
+           message: "Not Found"
+        });
+         return;
+     }
+     res.json({
+        confirmation: 'success',
+        results: results 
+     });
+  });
 });
 
 router.post('/:resource', function(req, res, next) {
   
   var resource = req.params.resource;
-  console.log(resource)
-  if(resource === 'zone') {
-     ZoneController.create(req.body, function(err, results) {
+  
+  var controller = controllers[resource];
+  
+  if(controller == null) {
+     res.json({
+        confirmation: 'fail',
+        message: 'Not a valid resource'
+     });
+     return;
+  }
+
+   controller.create(req.body, function(err, results) {
         if(err) {
            res.json({
               confirmation:'fail',
@@ -65,5 +91,4 @@ router.post('/:resource', function(req, res, next) {
            results: results 
         });
      });
-  }
 });
